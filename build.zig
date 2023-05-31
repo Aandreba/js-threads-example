@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
     var target = default_target(.wasm32, .freestanding);
     target.cpu.features = std.Target.wasm.featureSet(&.{ .atomics, .bulk_memory, .mutable_globals });
 
-    _ = b.addModule("threads", .{
+    const threads = b.addModule("threads", .{
         .source_file = .{ .path = "js-threads/src/main.zig" },
     });
 
@@ -22,9 +22,11 @@ pub fn build(b: *std.Build) void {
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
         .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
+        .target = std.zig.CrossTarget.fromTarget(target),
         .optimize = optimize,
     });
+    exe.addModule("threads", threads);
+    exe.shared_memory = true;
     exe.linkage = .dynamic;
     exe.rdynamic = true;
 
@@ -60,7 +62,7 @@ pub fn build(b: *std.Build) void {
     // but does not run it.
     const unit_tests = b.addTest(.{
         .root_source_file = .{ .path = "src/main.zig" },
-        .target = target,
+        .target = std.zig.CrossTarget.fromTarget(target),
         .optimize = optimize,
     });
 
