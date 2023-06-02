@@ -4,16 +4,15 @@ var alloc = @import("alloc.zig").thread_safe_allocator;
 pub const Thread = @import("threads").Thread;
 
 export fn entry_point() void {
-    run() catch |e| return print("error: {s}", .{@errorName(e)});
+    run() catch |e| {
+        print_string("error");
+        print_string(@errorName(e));
+    };
 }
 
 fn run() !void {
-    _ = try Thread.spawn(.{}, main, .{});
-}
-
-fn main() void {
     print_string("Hello from thread 1!");
-    const thread = Thread.spawn(.{}, spawned_entry, .{}) catch @panic("Error spawning thread");
+    const thread = try Thread.spawn(.{}, spawned_entry, .{});
     thread.join();
 }
 

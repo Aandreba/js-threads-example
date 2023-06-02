@@ -26,8 +26,10 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe.addModule("threads", threads);
+    exe.import_memory = true;
     exe.shared_memory = true;
-    exe.max_memory = 65536 << 10;
+    exe.initial_memory = 17 * 65536;
+    exe.max_memory = 24 * 65536;
     exe.linkage = .dynamic;
     exe.rdynamic = true;
 
